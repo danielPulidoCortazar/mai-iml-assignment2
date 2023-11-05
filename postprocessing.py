@@ -4,6 +4,7 @@ from sklearn.manifold import Isomap
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 import matplotlib.pyplot as plt
 import sklearn
+import numpy as np
 
 def plot_data(data, labels):
 # Method to plot data as PCA and ISOMAP representation with the first two components.
