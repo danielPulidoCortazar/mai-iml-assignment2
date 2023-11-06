@@ -23,6 +23,7 @@ def plot_data(data, labels):
     # Create subplots for PCA and Isomap visualizations
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
+
     # Plot PCA visualization
     axes[0].scatter(X_pca[:, 0], X_pca[:, 1], c=labels, cmap='viridis', s=20)
     axes[0].set_title('PCA Visualization')
@@ -41,7 +42,7 @@ def plot_results(data, pred_labels, true_labels, classes_list):
 # Method to plot data as PCA and ISOMAP representation, confusion matrix and table of scores.
 # input has to be
     # data: np.array without labels
-    # pred_labels: predicated labels as label encoded classes (0,1,2,..)
+    # pred_labels: predicted labels as label encoded classes (0,1,2,..)
     # true_labels: true labels as label encoded classes (0,1,2,..)
     # classes_list: A list of the classes names which correspond to (0,1,2,..), for example: sklearn.preprocessing.LabelEncoder.classes_ (which was already trained before)
   pred_labels = np.array(pred_labels)
@@ -92,7 +93,7 @@ def plot_results(data, pred_labels, true_labels, classes_list):
   # Customize the appearance of the table
   tb.auto_set_font_size(False)
   tb.set_fontsize(12)
-  tb.scale(1, 1.5) 
+  tb.scale(1, 1.5)
   ax[3].axis('off')
 
   plt.show()
@@ -136,14 +137,10 @@ def fit_classes_name(labels_pred, labels_true, return_mapping_array=False):
     for k in range(n_classes):
         # set labels of output array according to best array, by passing a index array
         labels_new_pred[index[(labels_pred == k)]] = best[k]
-    
+
 
     if return_mapping_array:
         return labels_new_pred.astype(int), best.astype(int)
 
     return labels_new_pred.astype(int)
     # output: numpy array of reordered labels for labels_pred
-  #loop through number of classes
-  for k in range(n_classes):
-    # set labels of output array according to best array, by passing a index array
-    labels_new_pred[index[(labels_pred == k)]] = best[k]
