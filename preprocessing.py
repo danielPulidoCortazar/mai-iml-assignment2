@@ -34,7 +34,7 @@ def normalizeNumeric(df: pd.DataFrame, scaler=MinMaxScaler()) -> pd.DataFrame:
         features_numeric = pd.DataFrame(scaler.fit_transform(df.select_dtypes(include = ['float64'])))
         features_numeric.columns = numerical_names
         return features_numeric
-    return []
+    return np.asarray([])
 
 def getFirstNotNan(col):
     '''returns the first not null value in an array'''
@@ -96,7 +96,7 @@ def encodeCategorical(df: pd.DataFrame, type='one-hot') -> pd.DataFrame:
                     if pd.isnull(features_to_encode.iloc[row,col]):
                         features_categ.iloc[row,col] = features_to_encode.iloc[row,col]
             return features_categ
-    return []
+    return np.array([])
 
 def imputeMissing(df: pd.DataFrame) -> pd.DataFrame:
     '''imputes the missing values with KNN imputer, considering only the closest neighbour'''
@@ -152,3 +152,82 @@ def reduceDimensionsFor2dVisualization(dropped: pd.DataFrame, imputed: pd.DataFr
     transform_imputed = lambda a : pca.transform(dropStuff(a))
     transform_dropped = lambda a : pca.transform(a)
     return (pca_dropped, pca_imputed, transform_dropped, transform_imputed)
+
+
+# -----------------------------------------Preprocessing Pipeline Wrapper------------------------------------------------
+# The aim of this method is to abstract the preprocessing pipeline performed on the datasets. It encapsulates the use of
+# all the previous functions
+
+def preprocessing_pipeline(df: pd.DataFrame, name: str, type='onehot', impute=False, drop_ratio=0.2):
+    """ The aim of this method is to abstract and encapsulate the preprocessing pipeline performed on the datasets.
+
+    Input:
+        - df (dataframe): with feature and classes columns
+        - type (str): {onehot, labelled} It changes the output. Affects only categorical values. Numerical are always normalized
+        - impute (bool): It changes the output. Output impute or dropped samples with missing values
+        - drop_ratio (float [0,1]): It changes the output. To drop features that exceed drop_ratio (When type = 'imputed',
+            does not affect the output
+
+    Output: Feature dataset and labels column
+    """
+
+    # split labels and features
+    true_labels, classes = labelEncode(df.iloc[:, -1].to_numpy())
+    if name == 'autos':
+        classes = ['cheap', 'expensive']
+    unique_labels = list(set(true_labels))
+    features_raw = df.iloc[:, :-1]
+
+    features_numeric = normalizeNumeric(features_raw)
+    features_onehot = encodeCategorical(features_raw, 'one-hot')
+    features_labelled = encodeCategorical(features_raw, 'label')
+
+    if 0 != features_onehot.shape[0]:
+        t = len(features_onehot.columns) - len(features_labelled.columns)
+        if t > 0: print("one-hot encoding inflated the feature space's dimensionality by " + str(t) + "!\n")
+
+    # join normalized numercial and categorical one-hot encoded features
+    if 0 != features_numeric.shape[0] and 0 != features_onehot.shape[0]:
+        features_concat_onehot = features_onehot.join(features_numeric, how='right')
+    elif 0 != features_numeric.shape[0]:
+        features_concat_onehot = features_numeric
+    else:
+        features_concat_onehot = features_onehot
+
+    # join normalized numercial and categorical label encoded features
+    if 0 != features_numeric.shape[0] and 0 != features_labelled.shape[0]:
+        features_concat_labelled = features_labelled.join(features_numeric, how='right')
+    elif 0 != features_numeric.shape[0]:
+        features_concat_labelled = features_numeric
+    else:
+        features_concat_labelled = features_labelled
+
+    features_labelled_imputed = imputeMissing(features_concat_labelled)
+    features_labelled_dropped, true_labels_dropped = dropMissing(features_concat_labelled,
+                                                                 labels=true_labels, threshold=drop_ratio)
+    features_onehot_imputed = imputeMissing(features_concat_onehot)
+    features_onehot_dropped = dropMissing(features_concat_onehot, threshold=drop_ratio)
+
+    print("the dimensionality of the one-hot encoded dataset is " + str(len(features_labelled_imputed.columns)) + "\n")
+    print("the dimensionality of the label encoded dataset is " + str(len(features_labelled_imputed.columns)) + "\n")
+    n = features_concat_labelled.isna().sum().sum()
+    t2 = sum([True for _, row in features_concat_labelled.iterrows() if any(row.isnull())])
+    if n > 0: print("imputed " + str(n) + " values across " + str(t2) + " datapoints!\n")
+    n = len(features_concat_labelled.columns) - len(features_labelled_dropped.columns)
+    if n > 0: print("dropped " + str(n) + " features because more than " + str(
+        round(drop_ratio * 100)) + "% values of the feature were missing!\n")
+    n = len(features_concat_labelled) - len(features_labelled_dropped)
+    if n > 0: print("dropped " + str(n) + " datapoints because they had missing values!\n")
+
+    if impute:
+        if type == 'onehot':
+            return features_onehot_imputed, true_labels, classes
+        if type == 'labelled':
+            return features_onehot_imputed, true_labels, classes
+    else:
+        if type == 'onehot':
+            return features_onehot_dropped, true_labels_dropped, classes
+        if type == 'labelled':
+            return features_onehot_dropped, true_labels_dropped, classes
+
+

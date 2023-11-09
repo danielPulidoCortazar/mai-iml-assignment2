@@ -12,15 +12,16 @@ warnings.filterwarnings('ignore')
 
 def dim_red_clustering(X,labels_true, dim_red=None, dim_red_params=None, alg ='kmeans', alg_params = None):
     """
-    Its main objective is to encapsulate the dimensionality reduction process so it can be called repeatedly from main
+    Its main objective is to encapsulate the dimensionality reduction process along with
+    clustering so it can be called repeatedly from main
     This function receives as input:
         - X (nd-array): feature dataset
-        - y (array): true labels
+        - labels_true (array): true labels
         - dim_red (str): {pca, incr_pca, trunc_svd, pca_mai} / None
         - dim_red_params (dict): list of parameters for the dim. red. algorithm / None
         - alg (str): {kmeans, birch}
-        - alg_params (dict): list of parameters for the clustering algorithm
-    Outputs: Dataset without classes transformed
+        - alg_params (dict): list of parameters for the clustering algorithm / None
+    Outputs: Dataset without classes transformed, labels predicted
     """
 
     # Compute algorithms without dim. red. is defined
