@@ -6,6 +6,7 @@ import preprocessing
 import kmeans
 import postprocessing
 import warnings
+from pca_mai import my_pca
 warnings.filterwarnings('ignore')
 
 # --------------------------------------Dimensionality Reduction Function-----------------------------------------------
@@ -48,16 +49,17 @@ def dim_red_clustering(X,labels_true, dim_red=None, dim_red_params=None, alg ='k
             dim_red = TruncatedSVD(**dim_red_params)
             X_transformed = dim_red.fit_transform(X)
         if dim_red == 'pca_mai':
-            # implement
-            '''function that levi will implement'''
+            X_transformed = my_pca(X, **dim_red_params)
 
         # Algorithm on X_transformed
         if alg_params is None:
             dim_red_params = {}
         if alg == 'kmeans':
             labels_pred, C_store_best = kmeans.kmeans(X_transformed,**alg_params)
-        if alg == 'birch':
+        elif alg == 'birch':
             labels_pred = Birch(**alg_params).fit_predict(X_transformed)
+        else:
+            labels_pred = []
 
     return X_transformed, labels_pred
 
