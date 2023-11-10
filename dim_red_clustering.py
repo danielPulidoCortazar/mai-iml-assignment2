@@ -26,7 +26,8 @@ def dim_red_clustering(X,labels_true, dim_red=None, dim_red_params=None, alg ='k
     """
 
     # Compute algorithms without dim. red. is defined
-    if dim_red is None:
+    if dim_red is None or dim_red not in ['pca','incr_pca','trunc_svd','pca_mai']:
+        X_transformed = []
         if alg_params is None:
             dim_red_params = {}
         if alg == 'kmeans':
