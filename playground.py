@@ -5,7 +5,7 @@ import postprocessing
 from dim_red_clustering import dim_red_clustering
 
 # read dataset
-ds_name = 'iris'
+ds_name = 'vote'
 df = pd.DataFrame(arff.loadarff("datasets/" + ds_name + ".arff")[0])
 print(
     "Loaded '" + ds_name + "' dataset! Use the CLI argument 'dataset' to choose from ['autos','iris','vote'] datasets!")
@@ -68,14 +68,14 @@ pca_mai_params = {
 # ----------------------------------Modify parameters of Clustering Algorithms---------------------------------------------
 
 kmeans_params = {
-    'n_clusters': 3,
-    'distance': 'manhattan'
+    'n_clusters': 2,
+    'distance': 'euclidean'
 }
 
 birch_params = {
-    'threshold': 0.3,
-    'branching_factor': 50,
-    'n_clusters': 3,
+    'threshold': 0.5,
+    'branching_factor': 8,
+    'n_clusters': 2,
     'compute_labels': True,
     'copy': True
 }
@@ -84,7 +84,7 @@ birch_params = {
 # dim_red = pca, incr_pca, trunc_svd, pca_mai
 # alg = birch, kmeans
 
-X_transformed, labels_pred = dim_red_clustering(features, true_labels, dim_red='pca',
-                                                dim_red_params=pca_params, alg='birch', alg_params=birch_params)
+X_transformed, labels_pred = dim_red_clustering(features, true_labels, dim_red='pca_mai',
+                                                dim_red_params=pca_mai_params, alg='birch', alg_params=birch_params)
 
 postprocessing.plot_results(X_transformed, labels_pred, true_labels, classes)

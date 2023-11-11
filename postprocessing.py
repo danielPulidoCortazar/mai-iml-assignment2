@@ -55,9 +55,9 @@ def plot_results(data, pred_labels, true_labels, classes_list):
   dbs = sklearn.metrics.davies_bouldin_score(data, labels_pred)
   ars = sklearn.metrics.adjusted_rand_score(labels_pred=labels_pred, labels_true=labels_true)
   table = [
-    ["Silhouette Score", "{:.4f}".format(ss)],
-    ["Davies Bouldin Score", "{:.4f}".format(dbs)],
-    ["Adjusted Rand Score", "{:.4f}".format(ars)],
+    ["Silhouette", "{:.4f}".format(ss)],
+    ["Davies Bouldin", "{:.4f}".format(dbs)],
+    ["Adjusted Rand", "{:.4f}".format(ars)],
   ]
 
   # Perform PCA to reduce data to 2 dimensions
@@ -83,7 +83,8 @@ def plot_results(data, pred_labels, true_labels, classes_list):
   ax[1].set_xlabel('Isomap Component 1')
   ax[1].set_ylabel('Isomap Component 2')
 
-  cf = sns.heatmap(cf_matrix,xticklabels=classes_list, yticklabels=classes_list, annot=True, ax=ax[2], cbar=False)
+  cf = sns.heatmap(cf_matrix,xticklabels=classes_list, yticklabels=classes_list, annot=True,
+                   annot_kws= {'size' : 20},ax=ax[2], cbar=False)
   cf.set_ylabel('True Labels')
   cf.set_xlabel('Predicted Labels')
   cf.title.set_text('Confusion Matrix')
