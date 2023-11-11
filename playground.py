@@ -84,7 +84,7 @@ birch_params = {
 # dim_red = pca, incr_pca, trunc_svd, pca_mai
 # alg = birch, kmeans
 
-X_transformed, labels_pred = dim_red_clustering(features, true_labels, dim_red='pca_mai',
-                                                dim_red_params=pca_mai_params, alg='birch', alg_params=birch_params)
+X_transformed, labels_pred = dim_red_clustering(features, true_labels, dim_red=None,
+                                                dim_red_params=None, alg='kmeans', alg_params=kmeans_params)
 
 postprocessing.plot_results(X_transformed, labels_pred, true_labels, classes)
