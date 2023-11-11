@@ -59,6 +59,7 @@ trunc_svd_params = {
 }
 
 pca_mai_params = {
+    'n_components': 3,
     'print_details': False,
 }
 
@@ -81,7 +82,7 @@ birch_params = {
 # dim_red = None, 'pca', 'incr_pca', 'trunc_svd', 'pca_mai'
 # alg = birch, kmeans
 
-dim_red = 'incr_pca'
+dim_red = 'pca_mai'
 alg = 'kmeans'
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -104,5 +105,5 @@ if alg == 'birch':
 
 X_transformed, labels_pred = dim_red_clustering(features, true_labels, dim_red=dim_red,
                                                 dim_red_params=dim_red_params, alg=alg, alg_params=alg_params)
-
+print('Number of passed Dimension:',X_transformed.shape[1])
 postprocessing.plot_results(X_transformed, labels_pred, true_labels, classes)
