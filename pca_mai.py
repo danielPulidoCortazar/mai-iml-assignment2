@@ -1,6 +1,6 @@
 import numpy as np
 
-def my_pca(data, print_details = False):
+def my_pca(data, n_components = None, print_details = False):
     try:
         data = data.to_numpy()
     except:
@@ -28,4 +28,7 @@ def my_pca(data, print_details = False):
     for vector in data:
         changed_bases.append(transform_bases.dot(vector))
     changed_bases = np.array(changed_bases)
-    return changed_bases
+    if n_components is None:
+        return changed_bases
+    else:
+        return changed_bases[:, :n_components]
