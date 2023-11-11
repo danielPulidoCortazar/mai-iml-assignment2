@@ -178,7 +178,10 @@ def preprocessing_pipeline(df: pd.DataFrame, name: str, type='onehot', impute=Fa
     unique_labels = list(set(true_labels))
     features_raw = df.iloc[:, :-1]
 
-    features_numeric = normalizeNumeric(features_raw)
+    if name == 'iris':
+        features_numeric = features_raw
+    else:
+        features_numeric = normalizeNumeric(features_raw)
     features_onehot = encodeCategorical(features_raw, 'one-hot')
     features_labelled = encodeCategorical(features_raw, 'label')
 
