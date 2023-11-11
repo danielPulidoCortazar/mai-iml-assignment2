@@ -5,7 +5,7 @@ import postprocessing
 from dim_red_clustering import dim_red_clustering
 
 # read dataset
-ds_name = 'vote'
+ds_name = 'iris'
 df = pd.DataFrame(arff.loadarff("datasets/" + ds_name + ".arff")[0])
 print(
     "Loaded '" + ds_name + "' dataset! Use the CLI argument 'dataset' to choose from ['autos','iris','vote'] datasets!")
@@ -30,12 +30,11 @@ decodeBytesAndReplaceMissing(df)
 # |labelled | type = 'labelled', impute = True | type = 'labelled', impute = False |
 # |---------|----------------------------------|-----------------------------------|
 
-features, true_labels, classes = preprocessing_pipeline(df=df, name=ds_name,
-                                                        type='labelled', impute=True)
+features, true_labels, classes = preprocessing_pipeline(df=df, name=ds_name, type='onehot', impute=False)
 
 # ----------------------------------Modify parameters of Dim Red Algorithms---------------------------------------------
 pca_params = {
-    'n_components': None,
+    'n_components': 2,
     'copy': True,
     'whiten': False,
     'svd_solver': 'auto',
@@ -45,46 +44,65 @@ pca_params = {
 }
 
 incr_pca_params = {
-    'n_components': None,
+    'n_components': 2,
     'whiten': False,
     'copy': True,
     'batch_size': None
 }
 
 trunc_svd_params = {
-    'n_components': 4,
+    'n_components': 2,
     'algorithm': 'randomized',
     'n_iter': 5,
-    'n_oversamples': 10,
-    'power_iteration_normalizer': 'auto',
     'random_state': None,
     'tol': 0.0
 }
 
 pca_mai_params = {
-    'print_details': True,
+    'print_details': False,
 }
 
-# ----------------------------------Modify parameters of Clustering Algorithms---------------------------------------------
+# ----------------------------------Modify parameters of Clustering Algorithms------------------------------------------
 
 kmeans_params = {
-    'n_clusters': 2,
+    'n_clusters': 3,
     'distance': 'euclidean'
 }
 
 birch_params = {
-    'threshold': 0.5,
-    'branching_factor': 8,
-    'n_clusters': 2,
+    'threshold': 0.1,
+    'branching_factor': 6,
+    'n_clusters': 3,
     'compute_labels': True,
     'copy': True
 }
 
 # ----------------------------------Apply Algorithms with Dim Red Tech--------------------------------------------------
-# dim_red = pca, incr_pca, trunc_svd, pca_mai
+# dim_red = None, 'pca', 'incr_pca', 'trunc_svd', 'pca_mai'
 # alg = birch, kmeans
 
-X_transformed, labels_pred = dim_red_clustering(features, true_labels, dim_red=None,
-                                                dim_red_params=None, alg='kmeans', alg_params=kmeans_params)
+dim_red = 'incr_pca'
+alg = 'kmeans'
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+if dim_red == 'pca':
+    dim_red_params = pca_params
+if dim_red == 'pca_mai':
+    dim_red_params = pca_mai_params
+if dim_red == 'trunc_svd':
+    dim_red_params = trunc_svd_params
+if dim_red == 'incr_pca':
+    dim_red_params = incr_pca_params
+if dim_red == None:
+    dim_red_params = None
+
+if alg == 'kmeans':
+    alg_params = kmeans_params
+if alg == 'birch':
+    alg_params = birch_params
+
+X_transformed, labels_pred = dim_red_clustering(features, true_labels, dim_red=dim_red,
+                                                dim_red_params=dim_red_params, alg=alg, alg_params=alg_params)
 
 postprocessing.plot_results(X_transformed, labels_pred, true_labels, classes)
