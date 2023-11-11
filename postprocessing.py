@@ -93,7 +93,7 @@ def plot_results(data, pred_labels, true_labels, classes_list):
   tb= ax[3].table(cellText=table, loc='center', cellLoc='center')
   # Customize the appearance of the table
   tb.auto_set_font_size(False)
-  tb.set_fontsize(12)
+  tb.set_fontsize(15)
   tb.scale(1, 1.5)
   ax[3].axis('off')
 
